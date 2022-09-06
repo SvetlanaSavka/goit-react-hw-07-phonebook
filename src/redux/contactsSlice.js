@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   fetchContacts,
   fetchDeleteContacts,
@@ -16,10 +18,6 @@ export const contactsSlice = createSlice({
   name: 'contacts',
   initialState: { items: contacts, filter: '' },
   reducers: {
-    /*  addContact(state, action) {
-    
-      state.items = [...state.items, action.payload];
-    }, */
     setContacts(state, action) {
       state.items = action.payload;
     },
@@ -46,16 +44,30 @@ export const getFilter = state => state.contacts.filter;
 }; */
 
 export const getContactsAsync = () => async dispatch => {
-  const data = await fetchContacts();
-  dispatch(setContacts(data));
+  try {
+    const { data } = await fetchContacts();
+    dispatch(setContacts(data));
+  } catch (error) {
+    toast.error(error.message);
+  }
 };
 
 export const deleteContactAsync = id => async dispatch => {
-  const data = await fetchDeleteContacts(id);
-  dispatch(setContacts(data));
+  try {
+    await fetchDeleteContacts(id);
+    const { data } = await fetchContacts();
+    dispatch(setContacts(data));
+  } catch (error) {
+    toast.error(error.message);
+  }
 };
 
 export const addContactAsync = contact => async dispatch => {
-  const data = await fetchPostContacts(contact);
-  dispatch(setContacts(data));
+  try {
+    await fetchPostContacts(contact);
+    const { data } = await fetchContacts();
+    dispatch(setContacts(data));
+  } catch (error) {
+    toast.error(error.message);
+  }
 };
